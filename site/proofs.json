@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-10-03T22:03:58.580Z",
+  "cluster": "devnet",
+  "rpc": "https://api.devnet.solana.com",
+  "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  "proofs": [
+    {
+      "label": "Grower C",
+      "signature": "2q1u2x7mpCx9Yq16fe2SUZpLAFc3cSRLzp7PPsAj7LszVoSxXs1zhBu8uuqCQTa9R4eWCZvRaqkR95f68prhsiTn",
+      "expectedSigner": "7TkmNrpqPhxft7eh6fcZAK9d47WDED4CfTkbbEF6uV6j",
+      "anchoredAt": "2026-10-03T21:15:36.116Z",
+      "slot": 507130576,
+      "snapshot": {
+        "schemaVersion": "pog.snapshot.v1",
+        "source": "thecloudpot.rtdb",
+        "devicePseudonym": "054d9f5c0bb1fa1ace9d2707dd0a07b0fa897ad902754d2caf2409305677ca4e",
+        "firmwareVersion": "1.0.2",
+        "reportedTimestampRaw": "1791056516",
+        "reportIntervalMin": 5,
+        "soilMoistureUnit": "unspecified",
+        "plants": [
+          {
+            "id": "plant-01",
+            "soilMoisture": 56,
+            "temperatureC": 23.5625
+          },
+          {
+            "id": "plant-02",
+            "soilMoisture": 75,
+            "temperatureC": 23.5625
+          },
+          {
+            "id": "plant-03",
+            "soilMoisture": 75,
+            "temperatureC": 23.5625
+          },
+          {
+            "id": "plant-04",
+            "soilMoisture": 75,
+            "temperatureC": 23.5625
+          },
+          {
+            "id": "plant-05",
+            "soilMoisture": 76,
+            "temperatureC": 23.5625
+          },
+          {
+            "id": "plant-06",
+            "soilMoisture": 75,
+            "temperatureC": 23.5625
+          }
+        ]
+      }
+    },
+    {
+      "label": "Grower B",
+      "signature": "41bvyN7EKh7LF76AANMgNDgsHJFpLNymU5iuQjLVzZXbRYyJkToAT852PkEfTsPtfVAj6cjKBvqnnm7DA6TNuiDb",
+      "expectedSigner": "7TkmNrpqPhxft7eh6fcZAK9d47WDED4CfTkbbEF6uV6j",
+      "anchoredAt": "2026-10-03T21:01:55.387Z",
+      "slot": 507127077,
+      "snapshot": {
+        "schemaVersion": "pog.snapshot.v1",
+        "source": "thecloudpot.rtdb",
+        "devicePseudonym": "de8800ed32336c6a9a5196fc95a0d5694a56603bdc8ef441257bac53cf7d9ca8",
+        "firmwareVersion": "1.0.2",
+        "reportedTimestampRaw": "1791060860",
+        "reportIntervalMin": 5,
+        "soilMoistureUnit": "unspecified",
+        "plants": [
+          {
+            "id": "plant-01",
+            "soilMoisture": 59,
+            "temperatureC": 23.75
+          },
+          {
+            "id": "plant-02",
+            "soilMoisture": 61,
+            "temperatureC": 23.75
+          },
+          {
+            "id": "plant-03",
+            "soilMoisture": 61,
+            "temperatureC": 23.75
+          },
+          {
+            "id": "plant-04",
+            "soilMoisture": 58,
+            "temperatureC": 23.75
+          },
+          {
+            "id": "plant-05",
+            "soilMoisture": 64,
+            "temperatureC": 23.75
+          },
+          {
+            "id": "plant-06",
+            "soilMoisture": 60,
+            "temperatureC": 23.75
+          }
+        ]
+      }
+    },
+    {
+      "label": "Grower A",
+      "signature": "4SrTm6ac1tQxo9RyX8YHrbfVbs65ipk58wQVZqfUjkQRVES8bYDFqyjFTM88DvxTHKSZ5JDkogCNmqiaQiRTLj4Q",
+      "expectedSigner": "7TkmNrpqPhxft7eh6fcZAK9d47WDED4CfTkbbEF6uV6j",
+      "anchoredAt": "2026-10-03T20:48:21.592Z",
+      "slot": 507123606,
+      "snapshot": {
+        "schemaVersion": "pog.snapshot.v1",
+        "source": "thecloudpot.rtdb",
+        "devicePseudonym": "ff039c4db98d87a8fc84665d27da32a8ec826e0d4a4845bc3dc8517a482c8e5e",
+        "firmwareVersion": "1.0.2",
+        "reportedTimestampRaw": "1790969067",
+        "reportIntervalMin": 5,
+        "soilMoistureUnit": "unspecified",
+        "plants": [
+          {
+            "id": "plant-01",
+            "soilMoisture": 74,
+            "temperatureC": 26.25
+          },
+          {
+            "id": "plant-02",
+            "soilMoisture": 75,
+            "temperatureC": 26.25
+          },
+          {
+            "id": "plant-03",
+            "soilMoisture": 75,
+            "temperatureC": 26.25
+          },
+          {
+            "id": "plant-04",
+            "soilMoisture": 88,
+            "temperatureC": 26.25
+          },
+          {
+            "id": "plant-05",
+            "soilMoisture": 50,
+            "temperatureC": 26.25
+          },
+          {
+            "id": "plant-06",
+            "soilMoisture": 74,
+            "temperatureC": 26.25
+          }
+        ]
+      }
+    }
+  ]
+}

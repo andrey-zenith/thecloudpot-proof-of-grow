@@ -1,0 +1,196 @@
+{
+  "LightSchedules": {
+    "Ext1": {
+      "enabled": true,
+      "lastAutoOff": 1788792303450,
+      "lastAutoOn": 1788757862958,
+      "offTime": {
+        "hour": 10,
+        "minute": 45
+      },
+      "onTime": {
+        "hour": 1,
+        "minute": 11
+      },
+      "specificDays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "utcOffsetMinutes": -240
+    },
+    "Ext2": {
+      "enabled": true,
+      "lastAutoOff": 1788832219171,
+      "lastAutoOn": 1788831304105,
+      "offTime": {
+        "hour": 21,
+        "minute": 50
+      },
+      "onTime": {
+        "hour": 21,
+        "minute": 35
+      },
+      "specificDays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "utcOffsetMinutes": -240
+    },
+    "Fan": {
+      "enabled": true,
+      "lastAutoOff": 1788788703458,
+      "lastAutoOn": 1788831905370,
+      "offTime": {
+        "hour": 9,
+        "minute": 45
+      },
+      "onTime": {
+        "hour": 21,
+        "minute": 45
+      },
+      "specificDays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "utcOffsetMinutes": -240
+    },
+    "Light": {
+      "enabled": true,
+      "lastAutoOff": 1788793203853,
+      "lastAutoOn": 1788791402202,
+      "offTime": {
+        "hour": 11,
+        "minute": 0
+      },
+      "onTime": {
+        "hour": 10,
+        "minute": 30
+      },
+      "specificDays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "utcOffsetMinutes": -240
+    }
+  },
+  "RealTimeControl": {
+    "Commands": {
+      "Ext1": "OFF",
+      "Ext2": "OFF",
+      "Fan": "OFF",
+      "Light": "OFF",
+      "Pump1": "OFF",
+      "Pump2": "OFF",
+      "Pump3": "OFF",
+      "Pump4": "OFF",
+      "Pump5": "OFF",
+      "Pump6": "OFF",
+      "ReadCfg": "OFF"
+    },
+    "Configs": {
+      "pumpTimeout_seconds": "60",
+      "reportInterval_min": 5
+    },
+    "Status": {
+      "Weed1": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 74,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "Weed2": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 75,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "Weed3": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 75,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "Weed4": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 88,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "Weed5": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 50,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "Weed6": {
+        "Ext1": "OFF",
+        "Ext2": "OFF",
+        "Fan": "OFF",
+        "H2O": "OFF",
+        "Humidity": 74,
+        "Light": "OFF",
+        "Temperature": 26.25
+      },
+      "timestamp": "1790969067"
+    }
+  },
+  "Version": "1.0.2",
+  "WateringSchedules": {
+    "Weed3": {
+      "frequency": {
+        "interval": 1,
+        "specificDays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "type": "specificDays"
+      },
+      "lastManualWatering": 1788469191689,
+      "startDate": 1782414552093,
+      "time": {
+        "hour": 19,
+        "minute": 0
+      }
+    }
+  }
+}

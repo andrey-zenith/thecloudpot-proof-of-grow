@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proof of Grow | TheCloudPot</title>
+<meta name="description" content="Real soil-moisture readings from TheCloudPot grow controllers, fingerprinted on Solana. Edit a reading and watch the proof break.">
+<link rel="icon" type="image/png" href="favicon.png">
+<!-- Google Analytics 4: same property as thecloudpot.com (filter by hostname proof.thecloudpot.com) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XZY2HGKLFT"></script>
+<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date()); gtag("config", "G-XZY2HGKLFT");</script>
+<meta name="theme-color" content="#0e110f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e110f;
+    --card: #171c1a;
+    --card-2: #1d2421;
+    --border: #2a312d;
+    --fg: #e9ede9;
+    --muted: #879287;
+    --green: #2eb860;
+    --green-tint: rgba(46, 184, 96, 0.12);
+    --gold: #e8ba30;
+    --red: #f06a5a;
+    --red-tint: rgba(240, 106, 90, 0.12);
+    --soil: #232a26;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: "DM Sans", system-ui, sans-serif; font-size: 17px; line-height: 1.55; }
+  h1, h2, h3, .brand, .pot .val { font-family: "Space Grotesk", "DM Sans", sans-serif; }
+  a { color: var(--green); text-underline-offset: 3px; }
+  :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 6px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.86em; }
+
+  header.top { padding: 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--fg); text-decoration: none; font-size: 17px; }
+  .brand img { width: 40px; height: auto; display: block; }
+  .brand span { color: var(--muted); font-weight: 500; }
+  .net { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .brand, .net { white-space: nowrap; }
+  @media (max-width: 480px) { .brand span { display: none; } }
+  .net::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px var(--green-tint); }
+
+  .hero { padding: 56px 0 36px; text-align: center; }
+  .hero .logo { width: 132px; height: auto; display: block; margin: 0 auto 26px; }
+  .hero h1 { margin: 0 auto 16px; font-size: clamp(36px, 5.6vw, 60px); line-height: 1.04; font-weight: 700; letter-spacing: -0.02em; }
+  .hero p { margin: 0 auto; font-size: 18px; color: var(--muted); max-width: 60ch; }
+
+  .devices { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 8px 0 32px; }
+  .devices button {
+    font: inherit; font-size: 15px; cursor: pointer; text-align: left; color: var(--fg);
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px;
+  }
+  .devices button strong { display: block; font-weight: 700; }
+  .devices button span { color: var(--muted); }
+  .devices button:hover { border-color: var(--muted); }
+  .devices button[aria-pressed="true"] { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+
+  .stage { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; padding-bottom: 48px; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+
+  .verdict { border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px; border: 1px solid var(--border); background: var(--card-2); }
+  .verdict h2 { margin: 0 0 4px; font-size: 26px; line-height: 1.15; font-weight: 700; }
+  .verdict p { margin: 0; color: var(--muted); }
+  .verdict.ok { border-color: var(--green); background: var(--green-tint); }
+  .verdict.ok h2 { color: var(--green); }
+  .verdict.bad { border-color: var(--red); background: var(--red-tint); }
+  .verdict.bad h2 { color: var(--red); }
+  .verdict button { margin-top: 12px; }
+
+  .climate { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .climate .k { font-size: 14px; color: var(--muted); }
+  .climate .big { font-family: "Space Grotesk", "DM Sans", sans-serif; font-weight: 700; font-size: 48px; line-height: 1.05; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .climate .sub { font-size: 13px; color: var(--muted); }
+  .climate.changed { border-color: var(--red); }
+  .climate.changed .big { color: var(--red); }
+  .section-h { margin: 0 0 12px; font-size: 18px; font-weight: 700; }
+  .pots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 560px) { .pots { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 22px; } }
+  .pot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .pot .name { font-size: 14px; color: var(--muted); }
+  .pot .val { font-weight: 700; font-size: 28px; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .gauge { position: relative; width: 100%; max-width: 72px; height: 150px; border-radius: 10px 10px 22px 22px; background: var(--soil); overflow: hidden; border: 1px solid var(--border); }
+  .gauge .water { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, #3fd174, var(--green)); transition: height 260ms ease; }
+  .pot.changed .gauge { border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
+  .pot.changed .gauge .water { background: var(--red); }
+  .pot.changed .val { color: var(--red); }
+  .step { display: flex; align-items: center; gap: 6px; }
+  .step button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-2); color: var(--fg); font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+  .step button:hover { border-color: var(--gold); color: var(--gold); }
+  .hint { margin: 18px 0 0; color: var(--muted); font-size: 15px; }
+  .actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: var(--radius); padding: 10px 18px; border: 1px solid var(--gold); background: var(--gold); color: var(--bg); }
+  .btn.ghost { background: transparent; color: var(--green); border-color: var(--green); }
+  .btn[hidden] { display: none; }
+
+  .side h3 { margin: 0 0 12px; font-size: 18px; font-weight: 700; }
+  .hashes { margin-bottom: 20px; }
+  .hashrow { margin: 0 0 12px; }
+  .hashrow:last-child { margin-bottom: 0; }
+  .hashrow .k { font-size: 14px; color: var(--muted); margin-bottom: 2px; }
+  .hashrow .v { word-break: break-all; line-height: 1.6; }
+  .hashrow .v.chain { color: var(--gold); }
+  .hashrow .v mark { background: var(--red-tint); color: var(--red); border-radius: 2px; }
+  dl.facts { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
+  dl.facts dt { color: var(--muted); }
+  dl.facts dd { margin: 0; word-break: break-all; }
+
+  section.explain { border-top: 1px solid var(--border); padding: 40px 0 56px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+  @media (max-width: 860px) { section.explain { grid-template-columns: 1fr; } }
+  section.explain h3 { margin: 0 0 6px; font-size: 18px; }
+  section.explain p { margin: 0; color: var(--muted); font-size: 16px; max-width: 46ch; }
+  footer { color: var(--muted); font-size: 14px; padding: 0 0 40px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  @media (prefers-reduced-motion: reduce) { .gauge .water { transition: none; } }
+
+  .preview { margin: 16px 0 0; padding: 12px 16px; border-radius: var(--radius); border: 1px dashed var(--gold); color: var(--fg); font-size: 15px; background: rgba(232, 186, 48, 0.07); }
+  .preview strong { color: var(--gold); }
+  .net.stale::before { background: var(--gold); box-shadow: 0 0 0 3px rgba(232, 186, 48, 0.15); }
+  .devices button em { display: block; font-style: normal; font-size: 13px; color: var(--green); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .tag.chain { color: var(--green); background: var(--green-tint); }
+  .tag.pend { color: var(--gold); background: rgba(232, 186, 48, 0.12); }
+  .tag.fail { color: var(--red); background: var(--red-tint); }
+  .tag.new { color: var(--bg); background: var(--gold); margin-left: 6px; }
+  .tag.sim { color: var(--muted); background: var(--card-2); border: 1px solid var(--border); }
+  .verdict.sim { border-color: var(--gold); background: rgba(232, 186, 48, 0.07); }
+  .verdict.sim h2 { color: var(--gold); }
+
+  .timeline { border-top: 1px solid var(--border); padding: 36px 0 12px; }
+  .tl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tl-head h2 { margin: 0; font-size: 26px; font-weight: 700; }
+  .tl-head p { margin: 0; color: var(--muted); font-size: 15px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  @media (max-width: 640px) { .multiples { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .mini { padding: 10px 10px 6px; } .mini svg { height: 64px; } }
+  .mini { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px 8px; position: relative; }
+  .mini .mh { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; }
+  .mini .mh b { font-family: "Space Grotesk", sans-serif; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .mini .mh span { color: var(--muted); }
+  .mini svg { display: block; width: 100%; height: 86px; cursor: crosshair; touch-action: none; }
+  .tip { position: absolute; pointer-events: none; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; white-space: nowrap; z-index: 2; transform: translate(-50%, -110%); }
+  .tip[hidden] { display: none; }
+  .tip b { font-variant-numeric: tabular-nums; }
+  .tip small { display: block; color: var(--muted); }
+
+  .history { list-style: none; margin: 0 0 12px; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .history li + li { border-top: 1px solid var(--border); }
+  .history button { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: grid; grid-template-columns: 170px 1fr 80px 150px 24px; gap: 12px; align-items: center; padding: 10px 16px; font-size: 15px; }
+  .history button:hover { background: var(--card); }
+  .history button:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; }
+  .history li.sel button { background: var(--card-2); box-shadow: inset 3px 0 0 var(--green); }
+  .history .when { color: var(--muted); }
+  .history .vals { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+  .history .t { color: var(--gold); font-variant-numeric: tabular-nums; }
+  .history a { color: var(--muted); text-decoration: none; }
+  .history a:hover { color: var(--green); }
+  @media (max-width: 640px) {
+    .history button { grid-template-columns: 1fr auto; row-gap: 2px; }
+    .history .vals { grid-column: 1 / -1; }
+    .history .t { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="https://thecloudpot.com"><img src="logo-mark.png" alt="" width="40" height="28">TheCloudPot <span>Proof of Grow</span></a>
+    <div class="net" id="live">Live on Solana Devnet</div>
+  </header>
+
+  <section class="hero">
+    <img class="logo" src="logo.png" alt="TheCloudPot" width="132" height="90">
+    <h1>Change one reading.<br>The proof breaks.</h1>
+    <p>These are real soil-moisture and temperature readings from TheCloudPot growers. A fingerprint of each set is stored on the Solana blockchain. Edit any value below and the readings stop matching it.</p>
+  </section>
+
+  <nav class="devices" id="devices" aria-label="Choose a grower"></nav>
+
+  <main class="stage" id="stage" aria-live="polite">
+    <div>
+      <div class="verdict" id="verdict"><h2>Loading proofs…</h2></div>
+      <div class="climate panel" id="climate"></div>
+      <h3 class="section-h">Soil moisture per plant</h3>
+      <div class="pots" id="pots"></div>
+      <p class="hint">Values as the sensors report them. Use − and + to change any reading.</p>
+      <div class="actions">
+        <button class="btn ghost" id="restore" hidden>Restore original readings</button>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="hashes panel">
+        <h3>Fingerprint (SHA-256)</h3>
+        <div class="hashrow"><div class="k">Stored on Solana</div><div class="v mono chain" id="h-chain">…</div></div>
+        <div class="hashrow"><div class="k">Of the readings shown</div><div class="v mono" id="h-local">…</div></div>
+      </div>
+      <div class="panel"><h3>Transaction</h3>
+      <dl class="facts" id="facts"></dl></div>
+    </aside>
+  </main>
+
+  <section class="timeline" id="timeline">
+    <div class="tl-head"><h2>Last 24 hours</h2><p id="tl-sub"></p></div>
+    <div class="legend"><span><i style="background:var(--green)"></i>Soil moisture</span><span><i style="background:var(--gold)"></i>Temperature</span><span>Every value on these lines is a proof anchored on Solana</span></div>
+    <div class="multiples" id="multiples"></div>
+    <h3 class="section-h">Proof history</h3>
+    <ol class="history" id="history"></ol>
+    <button class="btn ghost" id="more" type="button">Show more</button>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h3>How it works</h3>
+      <p>The controller's readings are cleaned to a fixed set of fields, written in one canonical JSON form and hashed with SHA-256. Only that hash goes on-chain, in a Memo signed by TheCloudPot's wallet.</p>
+    </div>
+    <div>
+      <h3>Checked in your browser</h3>
+      <p>This page reads the transaction straight from Solana Devnet and recomputes the hash on your device. It does not trust our servers for either step.</p>
+    </div>
+    <div>
+      <h3>What it does not prove</h3>
+      <p>It shows the readings are unchanged since they were anchored and who signed them. It does not show the sensors are calibrated. Grower hardware IDs (MAC addresses) are never published.</p>
+    </div>
+  </section>
+  <footer><span id="foot"></span><a href="https://thecloudpot.com">thecloudpot.com</a></footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const track = (name, params = {}) => { try { if (typeof window.gtag === "function") window.gtag("event", name, params); } catch { /* analytics must never break the page */ } };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const short = (s, a = 8, b = 6) => (s && s.length > a + b + 1 ? s.slice(0, a) + "…" + s.slice(-b) : s);
+  const fmtTime = (sec) => new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(sec * 1000)) + " UTC";
+  const fmtShort = (sec) => new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(new Date(sec * 1000)) + " UTC";
+  const ago = (sec) => { const m = Math.max(0, Math.round((Date.now() / 1000 - sec) / 60)); return m < 1 ? "just now" : m < 60 ? `${m} min ago` : `${Math.floor(m / 60)} h ${m % 60} min ago`; };
+
+  // ---- RFC 8785 (JCS), SHA-256, base58, memo parsing: same as the live page ----
+  const jcs = (v) => {
+    if (v === null || typeof v !== "object") { if (typeof v === "number" && !Number.isFinite(v)) throw new Error("non-finite number"); return JSON.stringify(v); }
+    if (Array.isArray(v)) return "[" + v.map(jcs).join(",") + "]";
+    return "{" + Object.keys(v).sort().map((k) => JSON.stringify(k) + ":" + jcs(v[k])).join(",") + "}";
+  };
+  const sha256hex = async (text) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  const b58decode = (s) => {
+    const bytes = [];
+    for (const c of s) { let carry = B58.indexOf(c); if (carry < 0) throw new Error("bad base58"); for (let j = 0; j < bytes.length; j++) { carry += bytes[j] * 58; bytes[j] = carry & 255; carry >>= 8; } while (carry > 0) { bytes.push(carry & 255); carry >>= 8; } }
+    for (const c of s) { if (c === "1") bytes.push(0); else break; }
+    return new Uint8Array(bytes.reverse());
+  };
+  const parseMemo = (bytes) => {
+    try {
+      const o = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+      if (!o || typeof o !== "object" || Object.keys(o).sort().join(",") !== "alg,app,canon,hash,schema,v") return null;
+      if (o.app !== "thecloudpot-pog" || o.v !== 1 || o.schema !== "pog.snapshot.v1" || o.alg !== "sha256" || o.canon !== "jcs-rfc8785") return null;
+      return /^[0-9a-f]{64}$/.test(o.hash) ? o : null;
+    } catch { return null; }
+  };
+
+  let config = null, growers = [], current = null, grower = null, historyShown = 8;
+  const chainCache = new Map();
+
+  async function rpc(method, params) {
+    const res = await fetch(config.rpc, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+    if (!res.ok) throw new Error("RPC HTTP " + res.status);
+    const body = await res.json();
+    if (body.error) throw new Error(body.error.message || "RPC error");
+    return body.result;
+  }
+  async function checkChain(e) {
+    if (!e.signature) return { state: "invalid", reason: "This proof was not sent to Solana." };
+    let tx = null, level = "finalized";
+    try {
+      tx = await rpc("getTransaction", [e.signature, { encoding: "json", commitment: "finalized", maxSupportedTransactionVersion: 0 }]);
+      if (!tx) { level = "confirmed"; tx = await rpc("getTransaction", [e.signature, { encoding: "json", commitment: "confirmed", maxSupportedTransactionVersion: 0 }]); }
+    } catch (err) { return { state: "unavailable", reason: "Couldn't reach Solana Devnet (" + err.message + ")." }; }
+    if (!tx) return { state: "unavailable", reason: "The transaction is not visible on Solana Devnet yet." };
+    const base = { slot: tx.slot, blockTime: tx.blockTime, level };
+    if (!tx.meta || tx.meta.err !== null) return { ...base, state: "invalid", reason: "The transaction failed on-chain." };
+    const msg = tx.transaction.message, loaded = tx.meta.loadedAddresses || { writable: [], readonly: [] };
+    const keys = [...msg.accountKeys, ...loaded.writable, ...loaded.readonly];
+    if (!keys.slice(0, msg.header.numRequiredSignatures).includes(e.expectedSigner)) return { ...base, state: "invalid", reason: "TheCloudPot's wallet did not sign this transaction." };
+    const memos = msg.instructions.filter((ix) => keys[ix.programIdIndex] === config.memoProgram && ix.accounts.some((i) => keys[i] === e.expectedSigner)).map((ix) => parseMemo(b58decode(ix.data))).filter(Boolean);
+    if (memos.length !== 1) return { ...base, state: "invalid", reason: "No Proof of Grow memo found in this transaction." };
+    return { ...base, state: "ok", hash: memos[0].hash };
+  }
+
+  // ---- Status reported by the Cloud Function (the browser still verifies independently) ----
+  const statusOf = (e) => {
+    if (e.state === "anchored") return ["chain", "Finalized ✓"];
+    if (e.state === "failed") return ["fail", "Failed"];
+    if (e.level === "confirmed") return ["pend", "Confirmed…"];
+    return ["pend", "Sending to Solana…"];
+  };
+  const NEW_MS = 90_000;
+  const isNew = (e) => e.seenAt && Date.now() - e.seenAt < NEW_MS;
+
+  // ---- Verifier ----
+  const soilChanges = () => current.values.filter((v, i) => v !== current.entry.snapshot.plants[i].soilMoisture).length;
+  function snapshotWith() { const s = structuredClone(current.entry.snapshot); s.plants.forEach((p, i) => { p.soilMoisture = current.values[i]; p.temperatureC = p.temperatureC + current.tempDelta; }); return s; }
+  function renderPots() {
+    const orig = current.entry.snapshot.plants;
+    $("pots").innerHTML = orig.map((p, i) => {
+      const v = current.values[i], changed = v !== p.soilMoisture;
+      return `<div class="pot${changed ? " changed" : ""}"><div class="name">Plant ${i + 1}</div><div class="val">${v}</div>
+        <div class="gauge" role="img" aria-label="Plant ${i + 1} soil moisture ${v}${changed ? ", changed from " + p.soilMoisture : ""}"><div class="water" style="height:${Math.max(0, Math.min(100, v))}%"></div></div>
+        <div class="step"><button type="button" data-i="${i}" data-d="-1" aria-label="Lower plant ${i + 1} by 1">−</button><button type="button" data-i="${i}" data-d="1" aria-label="Raise plant ${i + 1} by 1">+</button></div></div>`;
+    }).join("");
+    $("restore").hidden = !(soilChanges() || current.tempDelta !== 0);
+  }
+  function renderClimate() {
+    const temps = current.entry.snapshot.plants.map((p) => p.temperatureC), lo = Math.min(...temps), hi = Math.max(...temps), d = current.tempDelta;
+    const shown = lo === hi ? (lo + d).toFixed(1) : `${(lo + d).toFixed(1)}–${(hi + d).toFixed(1)}`;
+    const el = $("climate");
+    el.classList.toggle("changed", d !== 0);
+    el.innerHTML = `<div><div class="k">Grower temperature</div><div class="big">${esc(shown)} °C</div>
+      <div class="sub">${d !== 0 ? "Changed by " + (d > 0 ? "+" : "") + d + " °C" : "One sensor for the whole grower · " + esc(lo === hi ? lo : lo + " to " + hi) + " °C as reported"}</div></div>
+      <div class="step"><button type="button" data-t="-0.5" aria-label="Lower temperature by 0.5 degrees">−</button><button type="button" data-t="0.5" aria-label="Raise temperature by 0.5 degrees">+</button></div>`;
+  }
+  function renderHashes(localHash) {
+    const c = current.chain, chain = c && c.hash;
+    $("h-chain").textContent = chain || (c ? "—" : "Checking…");
+    if (!chain) { $("h-local").textContent = localHash; return; }
+    $("h-local").innerHTML = [...localHash].map((ch, i) => (ch === chain[i] ? esc(ch) : `<mark>${esc(ch)}</mark>`)).join("");
+  }
+  function renderVerdict(localHash) {
+    const el = $("verdict"), c = current.chain, n = soilChanges(), t = current.tempDelta !== 0;
+    const what = [n ? `${n} soil reading${n === 1 ? "" : "s"}` : "", t ? "the temperature" : ""].filter(Boolean).join(" and ");
+    el.className = "verdict";
+    if (!c) { el.innerHTML = "<h2>Checking Solana Devnet…</h2><p>Reading the transaction and recomputing the fingerprint.</p>"; return; }
+    if (c.state === "unavailable") { el.innerHTML = `<h2>Couldn't check Solana right now</h2><p>${esc(c.reason)} This says nothing about whether the data changed.</p><button class="btn" id="retry" type="button">Check again</button>`; $("retry").onclick = () => { chainCache.delete(current.entry.id); select(current.entry.id, true); }; return; }
+    if (c.state === "invalid") { el.classList.add("bad"); el.innerHTML = `<h2>This proof is not valid</h2><p>${esc(c.reason)}</p>`; return; }
+    if (localHash === c.hash) { el.classList.add("ok"); el.innerHTML = `<h2>Verified on Solana</h2><p>These readings match the fingerprint TheCloudPot stored on-chain${c.blockTime ? " on " + esc(fmtTime(c.blockTime)) : ""}.</p>`; }
+    else { el.classList.add("bad"); el.innerHTML = `<h2>Doesn't match the blockchain</h2><p>You changed ${what}. The fingerprint no longer matches the one stored on Solana, so this set would be rejected.</p>`; }
+  }
+  function renderFacts() {
+    const e = current.entry, s = e.snapshot, c = current.chain || {};
+    const rows = !e.signature ? [["Transaction", "Not sent"], ["Readings taken", esc(fmtTime(Number(s.reportedTimestampRaw)))], ["Firmware", esc(s.firmwareVersion)], ["Report interval", esc(s.reportIntervalMin) + " min"], ["Grower ID", `<span class="mono">${esc(short(s.devicePseudonym, 8, 4))}</span>`]] : [
+      ["Transaction", `<a href="https://explorer.solana.com/tx/${encodeURIComponent(e.signature)}?cluster=devnet" target="_blank" rel="noopener">${esc(short(e.signature, 10, 8))}</a>`],
+      ["Signed by", `<span class="mono">${esc(short(e.expectedSigner, 8, 6))}</span>`],
+      ["Block time", c.blockTime ? esc(fmtTime(c.blockTime)) : "—"],
+      ["Slot", c.slot ? esc(c.slot.toLocaleString("en-US")) : "—"],
+      ["Confirmation", c.level ? esc(c.level) : "—"],
+      ["Readings taken", esc(fmtTime(Number(s.reportedTimestampRaw)))],
+      ["Firmware", esc(s.firmwareVersion)],
+      ["Report interval", esc(s.reportIntervalMin) + " min"],
+      ["Grower ID", `<span class="mono" title="Pseudonym: HMAC of the hardware ID">${esc(short(s.devicePseudonym, 8, 4))}</span>`]];
+    $("facts").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  }
+  async function refresh() {
+    const localHash = await sha256hex(jcs(snapshotWith()));
+    renderClimate(); renderPots(); renderHashes(localHash); renderVerdict(localHash); renderFacts();
+  }
+
+  // ---- Small multiples: one mini chart per measure, shared time axis ----
+  const W = 260, H = 86, PL = 4, PR = 4, PT = 8, PB = 14;
+  const chartEntries = () => {
+    const anchored = grower.entries.filter((e) => e.state === "anchored");
+    const recent = anchored.filter((e) => e.t >= Date.now() / 1000 - 86400);
+    return recent.length >= 2 ? recent : anchored.slice(-Math.max(2, recent.length));
+  };
+  function miniChart(key, title, unit, color, getV, fixed) {
+    const es = chartEntries();
+    if (es.length < 2) return `<div class="mini" data-key="${key}"><div class="mh"><span>${title}</span><b>${es.length ? esc(unit === "°C" ? getV(es[0]).toFixed(1) : getV(es[0])) + (unit ? " " + unit : "") : "—"}</b></div><p class="hint" style="margin:24px 0 30px">Collecting data: a new proof every 15 minutes.</p></div>`;
+    const t0 = es[0].t, t1 = es[es.length - 1].t;
+    const vals = es.map(getV);
+    let lo = fixed ? fixed[0] : Math.min(...vals), hi = fixed ? fixed[1] : Math.max(...vals);
+    if (!fixed) { const pad = Math.max(0.5, (hi - lo) * 0.25); lo -= pad; hi += pad; }
+    const X = (t) => PL + ((t - t0) / Math.max(1, t1 - t0)) * (W - PL - PR), Y = (v) => PT + (1 - (v - lo) / (hi - lo)) * (H - PT - PB);
+    const d = es.map((e, i) => `${i ? "L" : "M"}${X(e.t).toFixed(1)} ${Y(getV(e)).toFixed(1)}`).join("");
+    const sel = current.entry, selX = X(sel.t);
+    const chainDots = es.length <= 30 ? es.map((e) => `<circle cx="${X(e.t).toFixed(1)}" cy="${Y(getV(e)).toFixed(1)}" r="3" fill="${color}"/>`).join("") : "";
+    const latest = getV(es[es.length - 1]);
+    return `<div class="mini" data-key="${key}">
+      <div class="mh"><span>${title}</span><b>${esc(typeof latest === "number" && unit === "°C" ? latest.toFixed(1) : latest)}${unit ? " " + unit : ""}</b></div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${title} over the last ${es.length} proofs">
+        <line x1="${PL}" x2="${W - PR}" y1="${H - PB + 0.5}" y2="${H - PB + 0.5}" stroke="var(--border)"/>
+        <line x1="${selX.toFixed(1)}" x2="${selX.toFixed(1)}" y1="${PT - 4}" y2="${H - PB}" stroke="var(--muted)" stroke-dasharray="3 3"/>
+        <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        ${chainDots}
+        <line class="xh" x1="0" x2="0" y1="${PT - 4}" y2="${H - PB}" stroke="var(--fg)" stroke-opacity="0.5" visibility="hidden"/>
+        <text x="${PL}" y="${H - 2}" font-size="10" fill="var(--muted)">${esc(fmtShort(t0).replace(" UTC", ""))}</text>
+        <text x="${W - PR}" y="${H - 2}" font-size="10" fill="var(--muted)" text-anchor="end">${esc(fmtShort(t1).replace(" UTC", ""))}</text>
+      </svg><div class="tip" hidden></div></div>`;
+  }
+  // One shared soil-moisture scale for all six plants (comparable), fitted to the data shown.
+  const soilDomain = () => {
+    const all = chartEntries().flatMap((e) => e.snapshot.plants.map((p) => p.soilMoisture));
+    const lo = Math.min(...all), hi = Math.max(...all), pad = Math.max(3, (hi - lo) * 0.15);
+    return [Math.max(0, Math.floor(lo - pad)), Math.min(100, Math.ceil(hi + pad))];
+  };
+  const measures = () => { const dom = soilDomain(); return [
+    ["temp", "Temperature", "°C", "var(--gold)", (e) => e.snapshot.plants[0].temperatureC, null],
+    ...[0, 1, 2, 3, 4, 5].map((i) => [`p${i}`, `Plant ${i + 1}`, "", "var(--green)", (e) => e.snapshot.plants[i].soilMoisture, dom]),
+  ]; };
+  function renderTimeline() {
+    const es = grower.entries, ce = chartEntries();
+    const dom = soilDomain();
+    $("tl-sub").textContent = `${grower.label} · ${ce.length} proofs in the charts · soil charts share a ${dom[0]}–${dom[1]} scale`;
+    $("multiples").innerHTML = measures().map((m) => miniChart(...m)).join("");
+    const rows = es.slice().reverse().slice(0, historyShown);
+    $("history").innerHTML = rows.map((e) => `<li class="${e.id === current.entry.id ? "sel" : ""}"><button type="button" data-id="${esc(e.id)}">
+        <span class="when">${esc(fmtShort(e.t))}</span>
+        <span class="vals">${e.snapshot.plants.map((p) => String(p.soilMoisture).padStart(2, " ")).join(" · ")}</span>
+        <span class="t">${e.snapshot.plants[0].temperatureC.toFixed(1)} °C</span>
+        <span><span class="tag ${statusOf(e)[0]}">${statusOf(e)[1]}</span>${isNew(e) ? '<span class="tag new">New</span>' : ""}</span>
+        <span>${!e.signature ? "" : `<a href="https://explorer.solana.com/tx/${encodeURIComponent(e.signature)}?cluster=devnet" target="_blank" rel="noopener" aria-label="Open in Solana Explorer" title="Open in Solana Explorer">↗</a>`}</span>
+      </button></li>`).join("");
+    $("more").hidden = historyShown >= es.length;
+  }
+  $("multiples").addEventListener("pointermove", (ev) => {
+    const svg = ev.target.closest("svg"); if (!svg) return;
+    const card = svg.parentElement, r = svg.getBoundingClientRect(), es = chartEntries();
+    const fx = (ev.clientX - r.left) / r.width * W, t0 = es[0].t, t1 = es[es.length - 1].t;
+    const tAt = t0 + ((fx - PL) / (W - PL - PR)) * (t1 - t0);
+    const e = es.reduce((a, b) => (Math.abs(b.t - tAt) < Math.abs(a.t - tAt) ? b : a));
+    const m = measures().find((x) => x[0] === card.dataset.key), v = m[4](e);
+    const x = PL + ((e.t - t0) / Math.max(1, t1 - t0)) * (W - PL - PR);
+    const xh = svg.querySelector(".xh"); xh.setAttribute("x1", x); xh.setAttribute("x2", x); xh.setAttribute("visibility", "visible");
+    const tip = card.querySelector(".tip");
+    tip.hidden = false; tip.style.left = (svg.offsetLeft + (x / W) * r.width) + "px"; tip.style.top = svg.offsetTop + "px";
+    tip.innerHTML = `<b>${esc(m[2] === "°C" ? v.toFixed(2) + " °C" : v)}</b> ${esc(m[1])}<small>${esc(fmtShort(e.t))} · on Solana · click to open</small>`;
+    svg.dataset.hover = e.id;
+  });
+  $("multiples").addEventListener("pointerleave", () => { document.querySelectorAll(".mini .tip").forEach((t) => (t.hidden = true)); document.querySelectorAll(".mini .xh").forEach((l) => l.setAttribute("visibility", "hidden")); }, true);
+  $("multiples").addEventListener("pointerout", (ev) => { const svg = ev.target.closest && ev.target.closest("svg"); if (svg && !svg.contains(ev.relatedTarget)) { svg.parentElement.querySelector(".tip").hidden = true; svg.querySelector(".xh").setAttribute("visibility", "hidden"); } });
+  $("multiples").addEventListener("click", (ev) => { const svg = ev.target.closest("svg"); if (svg && svg.dataset.hover) select(svg.dataset.hover, false, "chart"); });
+  $("history").addEventListener("click", (ev) => { if (ev.target.closest("a")) return; const b = ev.target.closest("button[data-id]"); if (b) select(b.dataset.id, false, "history"); });
+  document.addEventListener("click", (ev) => { const a = ev.target.closest && ev.target.closest('a[href*="explorer.solana.com"]'); if (a) track("pog_open_explorer", { grower: grower ? grower.label : "" }); });
+  $("more").addEventListener("click", () => { historyShown += 16; renderTimeline(); });
+
+  // ---- Selection ----
+  const findEntry = (id) => { for (const g of growers) { const e = g.entries.find((x) => x.id === id); if (e) return [g, e]; } return [null, null]; };
+  async function select(id, force, source) {
+    const [g, e] = findEntry(id);
+    if (!e) return;
+    if (g !== grower) historyShown = 8;
+    grower = g;
+    current = { entry: e, values: e.snapshot.plants.map((p) => p.soilMoisture), tempDelta: 0, chain: chainCache.get(id) || null };
+    document.querySelectorAll("#devices button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.g === g.label)));
+    renderTimeline();
+    if (source) track("pog_select_proof", { grower: g.label, source });
+    await refresh();
+    if (!current.chain || force) {
+      const result = await checkChain(e);
+      chainCache.set(id, result);
+      track("pog_chain_check", { grower: g.label, result: result.state });
+      if (current.entry.id === id) { current.chain = result; await refresh(); }
+    }
+  }
+  function renderLive() {
+    const latest = Math.max(...growers.flatMap((g) => g.entries.filter((e) => e.state === "anchored").map((e) => e.t)));
+    const el = $("live"), mins = (Date.now() / 1000 - latest) / 60;
+    el.textContent = `Last proof ${ago(latest)}`;
+    el.classList.toggle("stale", mins > 45);
+    document.querySelectorAll("#devices button").forEach((b) => { const g = growers.find((x) => x.label === b.dataset.g); b.querySelector("em").textContent = `Latest proof ${ago(g.entries[g.entries.length - 1].t)}`; });
+  }
+
+  const trackTamper = (kind) => { if (!current.tampered) { current.tampered = true; track("pog_tamper", { grower: grower.label, kind }); } };
+  // No upper clamp: a sensor can report above 100 (raw value), and editing must move one step from it.
+  $("pots").addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (!b) return; const i = Number(b.dataset.i); current.values[i] = Math.max(0, current.values[i] + Number(b.dataset.d)); trackTamper("soil"); refresh(); });
+  $("climate").addEventListener("click", (e) => { const b = e.target.closest("button[data-t]"); if (!b) return; current.tempDelta = Math.round((current.tempDelta + Number(b.dataset.t)) * 2) / 2; trackTamper("temperature"); refresh(); });
+  $("restore").addEventListener("click", () => { current.values = current.entry.snapshot.plants.map((p) => p.soilMoisture); current.tempDelta = 0; current.tampered = false; track("pog_restore", { grower: grower.label }); refresh(); });
+
+  // ---- Data: manual proofs (proofs.json) + automatic proofs from the Cloud Function (/api/proofs) ----
+  const labels = new Map(); // devicePseudonym -> "Grower X"
+  const labelFor = (pseudo, hint) => {
+    if (!labels.has(pseudo)) labels.set(pseudo, hint || `Grower ${String.fromCharCode(65 + labels.size)}`);
+    return labels.get(pseudo);
+  };
+  const byKey = new Map(); // signature (or proof key) -> entry
+  let firstLoad = true;
+
+  function ingest(p, source) {
+    const key = p.signature || `${p.snapshot.devicePseudonym}:${p.snapshot.reportedTimestampRaw}`;
+    const prev = byKey.get(key);
+    const e = Object.assign(prev || { id: key, seenAt: firstLoad ? 0 : Date.now() }, {
+      t: Number(p.snapshot.reportedTimestampRaw),
+      snapshot: p.snapshot,
+      signature: p.signature || null,
+      expectedSigner: p.expectedSigner,
+      state: p.state || "anchored",
+      level: p.level || (p.state === "anchored" || !p.state ? "finalized" : null),
+      source,
+    });
+    e.grower = labelFor(p.snapshot.devicePseudonym, p.label ? String(p.label).replace(/^Device /, "Grower ") : null);
+    byKey.set(key, e);
+  }
+
+  function rebuild() {
+    const map = new Map();
+    for (const e of byKey.values()) { if (!map.has(e.grower)) map.set(e.grower, []); map.get(e.grower).push(e); }
+    growers = [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([label, entries]) => ({
+      label, entries: entries.sort((a, b) => a.t - b.t), real: entries.filter((x) => x.state === "anchored"),
+    }));
+    const navHtml = growers.map((g) => `<button type="button" data-g="${esc(g.label)}" aria-pressed="false"><strong>${esc(g.label)}</strong><em></em></button>`).join("");
+    if ($("devices").dataset.html !== navHtml) { $("devices").innerHTML = navHtml; $("devices").dataset.html = navHtml; }
+    const total = byKey.size, auto = [...byKey.values()].filter((e) => e.source === "api").length;
+    $("foot").textContent = `${total} proofs on Solana ${config.cluster} · ${growers.length} growers · ${auto ? "a new proof every 15 minutes" : "automatic anchoring starting soon"}`;
+    renderLive();
+  }
+
+  async function loadApi() {
+    try {
+      const r = await fetch("/api/proofs", { cache: "no-cache" });
+      if (!r.ok) return false;
+      const data = await r.json();
+      (data.proofs || []).forEach((p) => p && p.snapshot && ingest(p, "api"));
+      return true;
+    } catch { return false; }
+  }
+
+  async function poll() {
+    if (!(await loadApi())) return;
+    rebuild();
+    if (grower) { grower = growers.find((g) => g.label === grower.label) || grower; renderTimeline(); }
+  }
+
+  $("devices").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-g]"); if (!b) return;
+    const g = growers.find((x) => x.label === b.dataset.g);
+    const last = g.real[g.real.length - 1] || g.entries[g.entries.length - 1];
+    select(last.id, false, "grower");
+  });
+
+  fetch("proofs.json", { cache: "no-cache" })
+    .then((r) => (r.ok ? r.json() : { cluster: "devnet", rpc: "https://api.devnet.solana.com", memoProgram: "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr", proofs: [] }))
+    .then(async (data) => {
+      config = data;
+      (config.proofs || []).forEach((p) => ingest(p, "manual"));
+      await loadApi();
+      firstLoad = false;
+      if (!byKey.size) throw new Error("No proofs published yet.");
+      rebuild();
+      setInterval(renderLive, 30000);
+      setInterval(poll, 30000);
+      const newest = growers.map((g) => g.real[g.real.length - 1]).filter(Boolean).sort((a, b) => b.t - a.t)[0];
+      select((newest || [...byKey.values()][0]).id);
+    })
+    .catch((e) => { $("verdict").innerHTML = `<h2>Couldn't load the proofs</h2><p>${esc(e.message)}</p>`; });
+})();
+</script>
+</body>
+</html>

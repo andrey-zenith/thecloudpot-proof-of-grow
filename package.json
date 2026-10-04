@@ -1,0 +1,36 @@
+{
+  "name": "thecloudpot-proof-of-grow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TheCloudPot Proof of Grow — MVP Solana Devnet (snapshot -> JCS -> SHA-256 -> Memo -> verify)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "snapshot": "tsx src/cli/snapshot.ts",
+    "devices": "tsx src/cli/devices.ts",
+    "keygen": "tsx src/cli/keygen.ts",
+    "balance": "tsx src/cli/balance.ts",
+    "publish-proof": "tsx src/cli/publish.ts",
+    "verify": "tsx src/cli/verify.ts",
+    "tamper-test": "tsx src/cli/tamper-test.ts",
+    "site-data": "tsx src/cli/site-data.ts",
+    "site": "tsx src/cli/serve-site.ts",
+    "build:functions": "esbuild functions/src/index.ts --bundle --platform=node --target=node24 --format=esm --outfile=functions/lib/index.js --external:firebase-functions --external:firebase-admin --external:@solana/web3.js --external:canonicalize --external:bs58 --log-level=warning"
+  },
+  "dependencies": {
+    "@solana/web3.js": "1.98.4",
+    "bs58": "6.0.0",
+    "canonicalize": "3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "esbuild": "0.28.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}
