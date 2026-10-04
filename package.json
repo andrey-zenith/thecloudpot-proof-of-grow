@@ -2,6 +2,7 @@
   "name": "thecloudpot-proof-of-grow",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "description": "TheCloudPot Proof of Grow — MVP Solana Devnet (snapshot -> JCS -> SHA-256 -> Memo -> verify)",
   "type": "module",
   "engines": {

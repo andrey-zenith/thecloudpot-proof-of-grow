@@ -103,3 +103,18 @@ Firebase Cloud Functions (2nd gen), Firestore, Realtime Database, Hosting, Secre
 2. A Solana program with per-grow accounts ("Grow Passport").
 3. Device-side signing, so the proof covers the controller itself.
 4. New evidence types: genetics, harvest and lab results.
+
+## License
+
+Proof of Grow is free software: you can redistribute it and/or modify it under the terms of the
+**GNU General Public License v3.0 or later** (see [LICENSE](LICENSE)).
+
+Copyright (C) 2026 Andrey (andrey-zenith)
+
+**Scope.** This license covers only the code in this repository. It does **not** cover any other TheCloudPot
+software (the Smart Grower firmware, the mobile app, the thecloudpot.com website or other backend services),
+which remain proprietary.
+
+**Trademarks.** The TheCloudPot name and logos (`site/logo.png`, `site/logo-mark.png`, `site/favicon.png`) are
+trademarks of TheCloudPot and are not licensed under the GPL. If you redistribute or deploy a modified version,
+remove them and use your own branding.
