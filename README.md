@@ -11,6 +11,10 @@ that a reading has not been changed.
 > Try it: open the live page, pick a proof, change one soil-moisture value by 1 point, and watch
 > "Verified on Solana" turn into "Doesn't match the blockchain".
 
+[![Live verifier: a real grower snapshot verified against its Solana Devnet transaction](docs/img/proof-verified.png)](https://proof.thecloudpot.com)
+
+<sub>Live page, Oct 4 2026: an automatic proof from Grower B, verified in the browser against its finalized Solana Devnet transaction.</sub>
+
 ---
 
 ## How it works
